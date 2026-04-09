@@ -38,13 +38,23 @@ export const registerService = async (userData) => {
       body: JSON.stringify(userData),
     });
     const registeredUser = await res.json();
+    const result = {
+      ...registeredUser,
+      ok: res.ok,
+      httpStatus: res.status,
+    };
     
-    if (registeredUser.status != "200 CREATED"){
-        console.log("Error: ", registeredUser)
+    if (!res.ok){
+        console.log("Error: ", result)
     }
 
-    return registeredUser;
+    return result;
   } catch (error) {
     console.log("Error: ", error);
+    return {
+      ok: false,
+      status: "NETWORK_ERROR",
+      message: "Unable to connect to server.",
+    };
   }
 };

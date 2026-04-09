@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@heroui/react";
 import { useForm } from "react-hook-form";
@@ -39,6 +40,7 @@ const RegisterSchema = z.object({
 });
 
 export default function RegisterFormComponent() {
+  const [submitError, setSubmitError] = useState("");
   const {
     register,
     handleSubmit,
@@ -57,6 +59,7 @@ export default function RegisterFormComponent() {
   const router = useRouter();
 
   const onSubmit = async (data) => {
+    setSubmitError("");
     const userData = {
       firstName: data.name.split(" ")[0],
       lastName: data.name.split(" ")[1],
@@ -68,10 +71,19 @@ export default function RegisterFormComponent() {
     console.log("data: ", userData)
 
     const result = await registerAction(userData);
-    if(result.status == "201 CREATED")
+    const isCreated =
+      result?.ok &&
+      (result?.httpStatus === 201 ||
+        result?.status === "201 CREATED" ||
+        result?.status === "200 CREATED");
+
+    if (isCreated) {
       router.push("/login");
-    
-    reset();
+      reset();
+      return;
+    }
+
+    setSubmitError(result?.message || "Register failed. Please check your data and try again.");
   };
 
   return (
@@ -80,6 +92,12 @@ export default function RegisterFormComponent() {
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
+      {submitError && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {submitError}
+        </div>
+      )}
+
       {/* Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
