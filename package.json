@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node server.js",
+    "dev": "PORT=3001 node server.js",
     "build": "next build",
-    "start": "next start",
+    "start": "PORT=3001 node server.js",
     "lint": "eslint"
   },
   "dependencies": {
